@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Protected Portfolio</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #fafafa;
+      color: #333;
+      margin: 0;
+    }
+    .box {
+      text-align: center;
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    input {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 200px;
+    }
+    button {
+      background: #4fb244;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #42a03a;
+    }
+    .error {
+      color: red;
+      font-size: 0.9rem;
+    }
+    .logout {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 14px;
+      color: #4fb244;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="box" id="loginBox">
+    <h2>Enter Password</h2>
+    <input type="password" id="password" placeholder="Password" />
+    <br />
+    <button onclick="checkPassword()">Enter</button>
+    <p id="error" class="error"></p>
+  </div>
+
+  <div id="logoutBox" style="display:none;">
+    <h2>Welcome! ✅</h2>
+    <p><button onclick="goToSite()">Continue to Site</button></p>
+    <span class="logout" onclick="logout()">Logout</span>
+  </div>
+
+  <script>
+    const correctPassword = "design2025"; // change this password
+
+    function checkPassword() {
+      const entered = document.getElementById("password").value.trim();
+      if (entered === correctPassword) {
+        localStorage.setItem("access", "granted");
+        showLogoutBox();
+      } else {
+        document.getElementById("error").textContent = "Incorrect password!";
+      }
+    }
+
+    function goToSite() {
+      window.location.href = "home.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("access");
+      location.reload();
+    }
+
+    function showLogoutBox() {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("logoutBox").style.display = "block";
+    }
+
+    // Auto-login check
+    if (localStorage.getItem("access") === "granted") {
+      showLogoutBox();
+    }
+  </script>
+</body>
+</html>
