@@ -6457,4 +6457,9 @@ hr {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+
+  .cs_focus_bg + .cs_focus_bg {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
 }/*# sourceMappingURL=style.css.map */
