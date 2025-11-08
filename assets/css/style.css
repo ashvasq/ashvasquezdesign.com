@@ -6458,8 +6458,20 @@ hr {
       -ms-flex-direction: column;
           flex-direction: column;
 
-  .cs_focus_bg + .cs_focus_bg {
+
+}/*# sourceMappingURL=style.css.map */
+
+/* Remove white gap between FAQ and footer */
+.cs_focus_bg {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+footer.cs_focus_bg {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
-}/*# sourceMappingURL=style.css.map */
+
+.cs_focus_bg + footer.cs_focus_bg {
+  margin-top: 0 !important;
+}
