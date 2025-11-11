@@ -783,6 +783,29 @@ Once everything’s approved and the deposit is received, your project officiall
       </div>
     </section>
   </main>
+  <!-- START: Community Post-it Wall Section -->
+<section id="postit-wall" class="p-8 bg-yellow-50 border-t border-yellow-200">
+  <h2 class="text-2xl font-bold mb-4 text-yellow-700">Community Post-it Wall 🎨</h2>
+  <div id="postit-controls" class="mb-4 flex items-center gap-2">
+    <label for="colorPicker" class="mr-2">Color:</label>
+    <input type="color" id="colorPicker" value="#ffeb3b">
+    <button type="button" id="btnUndo" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">Undo</button>
+    <button type="button" id="btnRedo" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">Redo</button>
+    <button type="button" id="btnClear" class="px-4 py-2 bg-red-200 hover:bg-red-300 rounded">Clear</button>
+    <button type="button" id="btnSave" class="px-4 py-2 bg-green-200 hover:bg-green-300 rounded">Submit for Review</button>
+  </div>
+  <canvas id="postitCanvas" width="800" height="600" class="border border-yellow-300 bg-white"></canvas>
+  <div id="stampArea" class="mt-4">
+    <p class="mb-2">Stickers / Stamps:</p>
+    <!-- Example sticker images; you’ll want to populate these or allow upload -->
+    <img src="assets/stamps/stamp1.png" alt="Stamp 1" class="w-12 h-12 inline-block cursor-pointer stamp">
+    <img src="assets/stamps/stamp2.png" alt="Stamp 2" class="w-12 h-12 inline-block cursor-pointer stamp">
+    <!-- … add more as desired -->
+  </div>
+  <p class="mt-2 text-sm text-gray-500">Each submission will be moderated before appearing publicly.</p>
+</section>
+<!-- END: Community Post-it Wall Section -->
+
   <!-- Start Footer Section -->
     <footer class="cs_footer cs_style_1 cs_type_1 cs_focus_bg cs_white_color">
     <div class="cs_height_100 cs_height_lg_80"></div>
