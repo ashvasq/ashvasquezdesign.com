@@ -315,3 +315,117 @@
     }
   }
 })(jQuery); // End of use strict
+document.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById('postitCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let currentColor = document.getElementById('colorPicker').value;
+  
+  const undoStack = [];
+  const redoStack = [];
+
+  // update color picker
+  document.getElementById('colorPicker').addEventListener('change', (e) => {
+    currentColor = e.target.value;
+    ctx.strokeStyle = currentColor;
+  });
+
+  // mouse events
+  canvas.addEventListener('mousedown', (e) => {
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  });
+  canvas.addEventListener('mousemove', (e) => {
+    if (!drawing) return;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+  canvas.addEventListener('mouseup', () => {
+    if (!drawing) return;
+    drawing = false;
+    // Save current state for undo
+    undoStack.push(canvas.toDataURL());
+    // Clear redo stack
+    redoStack.length = 0;
+  });
+  canvas.addEventListener('mouseout', () => {
+    if (drawing) {
+      drawing = false;
+      undoStack.push(canvas.toDataURL());
+      redoStack.length = 0;
+    }
+  });
+
+  // Undo
+  document.getElementById('btnUndo').addEventListener('click', () => {
+    if (undoStack.length > 0) {
+      redoStack.push(canvas.toDataURL());
+      const imgData = undoStack.pop();
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.drawImage(img,0,0);
+      };
+      img.src = imgData;
+    }
+  });
+
+  // Redo
+  document.getElementById('btnRedo').addEventListener('click', () => {
+    if (redoStack.length > 0) {
+      undoStack.push(canvas.toDataURL());
+      const imgData = redoStack.pop();
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.drawImage(img,0,0);
+      };
+      img.src = imgData;
+    }
+  });
+
+  // Clear
+  document.getElementById('btnClear').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Push empty state so undo still works
+    undoStack.push(canvas.toDataURL());
+    redoStack.length = 0;
+  });
+
+  // Sticker/stamp clicks
+  document.querySelectorAll('#stampArea .stamp').forEach(imgEl => {
+    imgEl.addEventListener('click', () => {
+      const x = 50;  // you may want to let user click to place
+      const y = 50;
+      ctx.drawImage(imgEl, x, y, 60, 60);
+      undoStack.push(canvas.toDataURL());
+      redoStack.length = 0;
+    });
+  });
+
+  // Submit for moderation
+  document.getElementById('btnSave').addEventListener('click', () => {
+    const dataURL = canvas.toDataURL();
+    // send dataURL to your backend for moderation + storage
+    fetch('/api/submitPostit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: dataURL, timestamp: Date.now() })
+    })
+    .then(res => res.json())
+    .then(json => {
+      alert('Thanks for your submission! It will appear once reviewed.');
+      // optionally clear canvas afterwards
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      undoStack.length = 0;
+      redoStack.length = 0;
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Submission failed — please try again.');
+    });
+  });
+});
