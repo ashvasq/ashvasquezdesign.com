@@ -315,117 +315,154 @@
     }
   }
 })(jQuery); // End of use strict
-document.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.getElementById('postitCanvas');
-  const ctx = canvas.getContext('2d');
-  let drawing = false;
-  let currentColor = document.getElementById('colorPicker').value;
-  
-  const undoStack = [];
-  const redoStack = [];
 
-  // update color picker
-  document.getElementById('colorPicker').addEventListener('change', (e) => {
-    currentColor = e.target.value;
-    ctx.strokeStyle = currentColor;
+    });
   });
+});
+// ================================
+// COMMUNITY POST-IT WALL
+// ================================
+document.addEventListener("DOMContentLoaded", () => {
+  const addNoteBtn = document.getElementById("addNoteBtn");
+  const clearBoardBtn = document.getElementById("clearBoardBtn");
+  const noteColor = document.getElementById("noteColor");
+  const noteBoard = document.getElementById("noteBoard");
+  const stickers = document.querySelectorAll(".sticker");
+  let draggedSticker = null;
 
-  // mouse events
-  canvas.addEventListener('mousedown', (e) => {
-    drawing = true;
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
-  });
-  canvas.addEventListener('mousemove', (e) => {
-    if (!drawing) return;
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.strokeStyle = currentColor;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
-  canvas.addEventListener('mouseup', () => {
-    if (!drawing) return;
-    drawing = false;
-    // Save current state for undo
-    undoStack.push(canvas.toDataURL());
-    // Clear redo stack
-    redoStack.length = 0;
-  });
-  canvas.addEventListener('mouseout', () => {
-    if (drawing) {
-      drawing = false;
-      undoStack.push(canvas.toDataURL());
-      redoStack.length = 0;
+  // --- Create new note ---
+  addNoteBtn.addEventListener("click", () => {
+    const note = document.createElement("div");
+    note.className = "postit";
+    note.style.backgroundColor = noteColor.value;
+    note.draggable = true;
+
+    // Canvas for drawing
+    const canvas = document.createElement("canvas");
+    canvas.width = 220;
+    canvas.height = 220;
+    note.appendChild(canvas);
+
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+    let history = [];
+    let redoStack = [];
+
+    function saveState() {
+      history.push(canvas.toDataURL());
+      redoStack = [];
     }
+
+    canvas.addEventListener("mousedown", e => {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+      saveState();
+    });
+
+    canvas.addEventListener("mousemove", e => {
+      if (!drawing) return;
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#000";
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    });
+
+    canvas.addEventListener("mouseup", () => drawing = false);
+    canvas.addEventListener("mouseleave", () => drawing = false);
+
+    // --- Note tools ---
+    const tools = document.createElement("div");
+    tools.className = "note-tools";
+    tools.innerHTML = `
+      <button class="undo">↩️</button>
+      <button class="redo">↪️</button>
+      <button class="clear">🧹</button>
+      <button class="delete">❌</button>
+    `;
+    note.appendChild(tools);
+
+    // Undo
+    tools.querySelector(".undo").addEventListener("click", () => {
+      if (history.length > 0) {
+        redoStack.push(history.pop());
+        const last = history[history.length - 1];
+        if (last) {
+          const img = new Image();
+          img.src = last;
+          img.onload = () => ctx.drawImage(img, 0, 0);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+    });
+
+    // Redo
+    tools.querySelector(".redo").addEventListener("click", () => {
+      if (redoStack.length > 0) {
+        const next = redoStack.pop();
+        const img = new Image();
+        img.src = next;
+        img.onload = () => ctx.drawImage(img, 0, 0);
+        history.push(next);
+      }
+    });
+
+    // Clear
+    tools.querySelector(".clear").addEventListener("click", () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      history = [];
+      redoStack = [];
+    });
+
+    // Delete
+    tools.querySelector(".delete").addEventListener("click", () => {
+      note.remove();
+    });
+
+    // Drag notes on board
+    note.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", "");
+      note.classList.add("dragging");
+    });
+
+    note.addEventListener("dragend", e => {
+      note.classList.remove("dragging");
+    });
+
+    noteBoard.appendChild(note);
   });
 
-  // Undo
-  document.getElementById('btnUndo').addEventListener('click', () => {
-    if (undoStack.length > 0) {
-      redoStack.push(canvas.toDataURL());
-      const imgData = undoStack.pop();
-      const img = new Image();
-      img.onload = () => {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.drawImage(img,0,0);
-      };
-      img.src = imgData;
-    }
+  // --- Clear all notes ---
+  clearBoardBtn.addEventListener("click", () => {
+    noteBoard.innerHTML = "";
   });
 
-  // Redo
-  document.getElementById('btnRedo').addEventListener('click', () => {
-    if (redoStack.length > 0) {
-      undoStack.push(canvas.toDataURL());
-      const imgData = redoStack.pop();
-      const img = new Image();
-      img.onload = () => {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.drawImage(img,0,0);
-      };
-      img.src = imgData;
-    }
-  });
-
-  // Clear
-  document.getElementById('btnClear').addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Push empty state so undo still works
-    undoStack.push(canvas.toDataURL());
-    redoStack.length = 0;
-  });
-
-  // Sticker/stamp clicks
-  document.querySelectorAll('#stampArea .stamp').forEach(imgEl => {
-    imgEl.addEventListener('click', () => {
-      const x = 50;  // you may want to let user click to place
-      const y = 50;
-      ctx.drawImage(imgEl, x, y, 60, 60);
-      undoStack.push(canvas.toDataURL());
-      redoStack.length = 0;
+  // --- Stickers drag & drop ---
+  stickers.forEach(sticker => {
+    sticker.addEventListener("dragstart", e => {
+      draggedSticker = sticker;
+      e.dataTransfer.setData("text/plain", sticker.src);
     });
   });
 
-  // Submit for moderation
-  document.getElementById('btnSave').addEventListener('click', () => {
-    const dataURL = canvas.toDataURL();
-    // send dataURL to your backend for moderation + storage
-    fetch('/api/submitPostit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: dataURL, timestamp: Date.now() })
-    })
-    .then(res => res.json())
-    .then(json => {
-      alert('Thanks for your submission! It will appear once reviewed.');
-      // optionally clear canvas afterwards
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      undoStack.length = 0;
-      redoStack.length = 0;
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Submission failed — please try again.');
-    });
+  noteBoard.addEventListener("dragover", e => e.preventDefault());
+
+  noteBoard.addEventListener("drop", e => {
+    e.preventDefault();
+    const targetNote = e.target.closest(".postit");
+    if (!targetNote || !draggedSticker) return;
+
+    const rect = targetNote.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const img = document.createElement("img");
+    img.src = draggedSticker.src;
+    img.className = "note-sticker";
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
+    targetNote.appendChild(img);
   });
 });
