@@ -6475,3 +6475,137 @@ footer.cs_focus_bg {
 .cs_focus_bg + footer.cs_focus_bg {
   margin-top: 0 !important;
 }
+/* ----------------------------------------------------
+   POST-IT WALL
+---------------------------------------------------- */
+
+#postit-wall {
+  background-color: #fffbea;
+  padding: 3rem 1rem;
+  text-align: center;
+  border-top: 3px solid #fcd34d;
+}
+
+#postit-wall h2 {
+  color: #92400e;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Controls */
+#postit-controls {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+#postit-controls input[type="color"] {
+  width: 40px;
+  height: 40px;
+  border: none;
+  cursor: pointer;
+}
+
+#postit-controls button {
+  background-color: #facc15;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+#postit-controls button:hover {
+  background-color: #fbbf24;
+}
+
+/* Board */
+#noteBoard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 200px;
+  padding: 1rem;
+  background-color: #fff9e6;
+  border: 2px dashed #fde68a;
+  border-radius: 1rem;
+}
+
+/* Note */
+.postit {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 0.5rem;
+  box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+  cursor: grab;
+  overflow: hidden;
+}
+
+.postit canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.note-tools {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  display: flex;
+  gap: 0.3rem;
+  background: rgba(255,255,255,0.7);
+  border-radius: 0.3rem;
+  padding: 2px 4px;
+}
+
+.note-tools button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Sticker panel */
+#stickerPanel {
+  margin: 1.5rem auto 2rem;
+  text-align: center;
+}
+
+#stickerPanel p {
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.sticker-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sticker {
+  width: 50px;
+  height: 50px;
+  cursor: grab;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.sticker:hover {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+/* Stickers on note */
+.note-sticker {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
